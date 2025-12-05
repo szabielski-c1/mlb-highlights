@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --mlb-navy: #041E42;
+  --mlb-red: #BF0D3E;
+  --mlb-charcoal: #1a1a2e;
+  --mlb-green: #00A651;
+}
+
+body {
+  background-color: var(--mlb-navy);
+  color: white;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar for date picker */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Play type badges */
+.badge-hr { background-color: #BF0D3E; }
+.badge-k { background-color: #6B7280; }
+.badge-2b { background-color: #3B82F6; }
+.badge-3b { background-color: #8B5CF6; }
+.badge-scoring { background-color: #00A651; }

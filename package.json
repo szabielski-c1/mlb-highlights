@@ -1,0 +1,35 @@
+{
+  "name": "mlb-highlights",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/szabielski-c1/mlb-highlights.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/szabielski-c1/mlb-highlights/issues"
+  },
+  "homepage": "https://github.com/szabielski-c1/mlb-highlights#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.1",
+    "next": "^16.0.7",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
+  }
+}
