@@ -23,6 +23,9 @@
   "homepage": "https://github.com/szabielski-c1/mlb-highlights#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.1",
+    "@elevenlabs/elevenlabs-js": "^2.26.0",
+    "@google/generative-ai": "^0.24.1",
+    "fluent-ffmpeg": "^2.1.3",
     "next": "^16.0.7",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"

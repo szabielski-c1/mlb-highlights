@@ -2,7 +2,7 @@
 
 import { formatPlay } from '@/lib/play-analyzer';
 
-export default function KeyPlays({ plays, highlights = [] }) {
+export default function KeyPlays({ plays }) {
   if (!plays || plays.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
@@ -11,23 +11,12 @@ export default function KeyPlays({ plays, highlights = [] }) {
     );
   }
 
-  // Try to match plays with video highlights
-  const getVideoForPlay = (play) => {
-    const batter = play.matchup?.batter?.fullName?.toLowerCase();
-    const event = play.result?.event?.toLowerCase();
-
-    return highlights.find(h => {
-      const headline = h.headline?.toLowerCase() || '';
-      return (batter && headline.includes(batter.split(' ').pop())) ||
-             (event === 'home run' && headline.includes('homer'));
-    });
-  };
-
   return (
     <div className="space-y-3">
       {plays.map((play, index) => {
         const formatted = formatPlay(play);
-        const video = getVideoForPlay(play);
+        // Use the pre-matched highlight from the API
+        const video = play.matchedHighlight;
 
         return (
           <div

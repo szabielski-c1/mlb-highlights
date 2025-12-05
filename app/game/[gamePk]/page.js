@@ -6,6 +6,7 @@ import { getTeam, getTeamLogo, getRivalry } from '@/lib/teams';
 import KeyPlays from '@/app/components/KeyPlays';
 import ScriptOptions from '@/app/components/ScriptOptions';
 import ScriptDisplay from '@/app/components/ScriptDisplay';
+import AtBatBrowser from '@/app/components/AtBatBrowser';
 
 export default function GamePage({ params }) {
   const { gamePk } = use(params);
@@ -15,6 +16,7 @@ export default function GamePage({ params }) {
   const [biggestSwings, setBiggestSwings] = useState([]);
   const [gameSummary, setGameSummary] = useState(null);
   const [highlights, setHighlights] = useState([]);
+  const [atBats, setAtBats] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,6 +25,11 @@ export default function GamePage({ params }) {
   const [scriptLength, setScriptLength] = useState('60');
   const [script, setScript] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Custom video from selected at-bats
+  const [selectedClips, setSelectedClips] = useState([]);
+  const [isGeneratingCustomVideo, setIsGeneratingCustomVideo] = useState(false);
+  const [customVideo, setCustomVideo] = useState(null);
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -38,6 +45,7 @@ export default function GamePage({ params }) {
         setBiggestSwings(data.biggestSwings || []);
         setGameSummary(data.gameSummary);
         setHighlights(data.highlights || []);
+        setAtBats(data.atBats || []);
       } catch (err) {
         console.error('Error:', err);
         setError(err.message);
@@ -218,8 +226,107 @@ export default function GamePage({ params }) {
         <h2 className="text-xl font-bold text-white mb-4">
           Key Plays ({keyPlays.length})
         </h2>
-        <KeyPlays plays={keyPlays} highlights={highlights} />
+        <KeyPlays plays={keyPlays} />
       </section>
+
+      {/* At-Bat Browser - Film Room Integration */}
+      {atBats.length > 0 && (
+        <section>
+          <AtBatBrowser
+            atBats={atBats}
+            gamePk={gamePk}
+            onSelectClips={setSelectedClips}
+          />
+
+          {/* Custom Video Generation from Selected Clips */}
+          {selectedClips.length > 0 && (
+            <div className="mt-4 p-4 bg-mlb-charcoal rounded-xl border border-white/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-white">
+                    Create Custom Highlight
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    {selectedClips.length} clip{selectedClips.length !== 1 ? 's' : ''} selected
+                  </p>
+                </div>
+                <button
+                  onClick={async () => {
+                    setIsGeneratingCustomVideo(true);
+                    try {
+                      // Transform selected clips to match expected format
+                      const clipsForVideo = selectedClips.map(clip => ({
+                        id: clip.id,
+                        videoUrl: clip.videoUrl,
+                        headline: clip.headline,
+                        event: clip.result,
+                        batter: clip.batter,
+                        playDescription: clip.description,
+                        inning: clip.inning,
+                        halfInning: clip.halfInning,
+                      }));
+
+                      const response = await fetch('/api/generate-custom-video', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          gameData,
+                          clips: clipsForVideo,
+                          style: scriptStyle,
+                          gamePk,
+                        }),
+                      });
+
+                      if (!response.ok) throw new Error('Failed to generate video');
+
+                      const data = await response.json();
+                      setCustomVideo(data);
+                    } catch (err) {
+                      console.error('Error generating custom video:', err);
+                      setError('Failed to generate custom video');
+                    } finally {
+                      setIsGeneratingCustomVideo(false);
+                    }
+                  }}
+                  disabled={isGeneratingCustomVideo}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${
+                    isGeneratingCustomVideo
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'bg-mlb-red hover:bg-red-600 text-white'
+                  }`}
+                >
+                  {isGeneratingCustomVideo ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Generating...
+                    </span>
+                  ) : (
+                    'Generate Custom Video'
+                  )}
+                </button>
+              </div>
+
+              {/* Custom Video Result */}
+              {customVideo && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <video
+                    src={`data:video/mp4;base64,${customVideo.video}`}
+                    controls
+                    className="w-full rounded-lg"
+                  />
+                  <a
+                    href={`data:video/mp4;base64,${customVideo.video}`}
+                    download={`custom-highlight-${gamePk}.mp4`}
+                    className="inline-block mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm text-white transition-colors"
+                  >
+                    Download Video
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Script Generation */}
       <section className="bg-mlb-charcoal rounded-2xl p-6 border border-white/10">
@@ -261,6 +368,10 @@ export default function GamePage({ params }) {
             script={script}
             isLoading={isGenerating}
             gamePk={gamePk}
+            scriptStyle={scriptStyle}
+            highlights={highlights}
+            keyPlays={keyPlays}
+            gameData={gameData}
           />
         </section>
       )}
