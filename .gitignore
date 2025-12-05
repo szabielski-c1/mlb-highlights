@@ -31,3 +31,9 @@ Thumbs.db
 # Build
 build/
 dist/
+
+# Credentials
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
