@@ -605,3 +605,5 @@ Added transition: bot-7.mp4
  ✓ Compiled in 43ms
  GET /api/inning-transition/bot-1 200 in 85ms (compile: 7ms, render: 78ms)
  ✓ Compiled in 43ms
+Video generated successfully: /var/folders/0n/594j1_716bqcbgv4hghrr4lh0000gn/T/mlb-highlights/776560/rundown-776560.mp4
+ POST /api/generate-rundown-video 200 in 108s (compile: 50ms, render: 108s)
