@@ -3,24 +3,17 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { getTeam, getTeamLogo, getRivalry } from '@/lib/teams';
-import KeyPlays from '@/app/components/KeyPlays';
-import AtBatBrowser from '@/app/components/AtBatBrowser';
-import RundownEditor from '@/app/components/RundownEditor';
+import UnifiedPlayList from '@/app/components/UnifiedPlayList';
 
 export default function GamePage({ params }) {
   const { gamePk } = use(params);
   const [gameData, setGameData] = useState(null);
   const [linescore, setLinescore] = useState(null);
-  const [keyPlays, setKeyPlays] = useState([]);
-  const [biggestSwings, setBiggestSwings] = useState([]);
   const [gameSummary, setGameSummary] = useState(null);
   const [highlights, setHighlights] = useState([]);
   const [atBats, setAtBats] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Rundown editor state
-  const [rundownClips, setRundownClips] = useState(null); // null = not in rundown mode
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -32,8 +25,6 @@ export default function GamePage({ params }) {
         const data = await response.json();
         setGameData(data.gameData);
         setLinescore(data.linescore);
-        setKeyPlays(data.keyPlays || []);
-        setBiggestSwings(data.biggestSwings || []);
         setGameSummary(data.gameSummary);
         setHighlights(data.highlights || []);
         setAtBats(data.atBats || []);
@@ -183,44 +174,26 @@ export default function GamePage({ params }) {
         )}
       </section>
 
-      {/* Key Plays */}
-      <section>
-        <h2 className="text-xl font-bold text-white mb-4">
-          Key Plays ({keyPlays.length})
-        </h2>
-        <KeyPlays plays={keyPlays} />
-      </section>
-
-      {/* Rundown Editor - shown when creating a rundown */}
-      {rundownClips && (
+      {/* Unified Play List - shows key plays pre-selected, others collapsible */}
+      {/* Includes inline video preview and transcript editor for selected plays */}
+      {atBats.length > 0 && (
         <section>
-          <RundownEditor
-            initialClips={rundownClips}
-            gamePk={gamePk}
-            onBack={() => setRundownClips(null)}
-          />
-        </section>
-      )}
-
-      {/* At-Bat Browser - Film Room Integration */}
-      {atBats.length > 0 && !rundownClips && (
-        <section>
-          <AtBatBrowser
+          <UnifiedPlayList
             atBats={atBats}
             gamePk={gamePk}
-            onCreateRundown={(clips) => setRundownClips(clips)}
+            titleCardUrl={highlights[0]?.videoUrl}
           />
         </section>
       )}
 
       {/* Video Highlights */}
-      {highlights.length > 0 && !rundownClips && (
+      {highlights.length > 0 && (
         <section>
           <h2 className="text-xl font-bold text-white mb-4">
-            Available Video Clips ({highlights.length})
+            MLB.tv Highlights ({highlights.length})
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {highlights.slice(0, 6).map((h) => (
+            {highlights.map((h) => (
               <a
                 key={h.id}
                 href={h.videoUrl}

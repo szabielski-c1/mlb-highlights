@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { transcribeVideo, cleanupTranscriptionFiles } from '@/lib/transcription';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 /**
  * Transcribe audio from a video URL
@@ -30,6 +32,20 @@ export async function POST(request) {
     audioPath = result.audioPath;
 
     console.log(`Transcription complete: ${result.words.length} words, ${result.duration.toFixed(2)}s`);
+
+    // Write word timestamps to file for debugging
+    const logLines = [`Transcription for ${clipId || 'unknown'} - ${result.words.length} words, ${result.duration.toFixed(2)}s`, ''];
+    result.words.forEach((w, i) => {
+      const prevEnd = i > 0 ? result.words[i-1].end : 0;
+      const gap = w.start - prevEnd;
+      const gapMarker = gap >= 0.3 ? ` [GAP: ${gap.toFixed(2)}s]` : '';
+      logLines.push(`  ${i}: "${w.word}" ${w.start.toFixed(2)}-${w.end.toFixed(2)}${gapMarker}`);
+    });
+    logLines.push('', '---', '');
+
+    // Append to debug log file
+    const logPath = path.join(process.cwd(), 'transcription-debug.log');
+    await fs.appendFile(logPath, logLines.join('\n'));
 
     return NextResponse.json({
       success: true,

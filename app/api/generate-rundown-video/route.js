@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
+import path from 'path';
 import { createRundownVideo } from '@/lib/video-processor';
 import { getSelectionSegments } from '@/lib/transcription';
 
 /**
  * Generate a video from rundown clips with selected word segments
  * POST /api/generate-rundown-video
- * Body: { gamePk, clips: [{ videoUrl, transcript, selectedWords }] }
+ * Body: { gamePk, clips: [{ videoUrl, transcript, selectedWords } | { isTransition, transitionKey }] }
  */
 export async function POST(request) {
   try {
-    const { gamePk, clips } = await request.json();
+    const { gamePk, clips, titleCardUrl } = await request.json();
 
     if (!gamePk) {
       return NextResponse.json(
@@ -26,31 +27,60 @@ export async function POST(request) {
       );
     }
 
-    console.log(`Generating rundown video for game ${gamePk} with ${clips.length} clips`);
+    // Count transitions and plays
+    const transitionCount = clips.filter(c => c.isTransition).length;
+    const playCount = clips.filter(c => !c.isTransition).length;
+    console.log(`Generating rundown video for game ${gamePk} with ${playCount} plays + ${transitionCount} transitions${titleCardUrl ? ' + title card' : ''}`);
 
     // Convert clips with word selections to clips with time segments
-    const clipsWithSegments = clips.map(clip => {
-      const segments = getSelectionSegments(
-        clip.transcript,
-        clip.selectedWords,
-        0.15 // 150ms buffer around words
-      );
+    // Also handle transition clips (which don't need segment processing)
+    const clipsWithSegments = [];
 
-      return {
-        videoUrl: clip.videoUrl,
-        segments
-      };
-    }).filter(clip => clip.segments.length > 0);
+    for (const clip of clips) {
+      // Handle transition clips
+      if (clip.isTransition && clip.transitionKey) {
+        const transitionPath = path.join(process.cwd(), 'innings', `${clip.transitionKey}.mp4`);
 
-    if (clipsWithSegments.length === 0) {
+        // Verify the transition file exists
+        try {
+          await fs.access(transitionPath);
+          clipsWithSegments.push({
+            isTransition: true,
+            transitionPath: transitionPath
+          });
+        } catch {
+          console.warn(`Transition file not found: ${clip.transitionKey}.mp4, skipping`);
+        }
+        continue;
+      }
+
+      // Handle regular play clips
+      if (clip.transcript && clip.selectedWords) {
+        const segments = getSelectionSegments(
+          clip.transcript,
+          clip.selectedWords,
+          0.15 // 150ms buffer around words
+        );
+
+        if (segments.length > 0) {
+          clipsWithSegments.push({
+            videoUrl: clip.videoUrl,
+            segments
+          });
+        }
+      }
+    }
+
+    // Must have at least one play clip (transitions alone aren't valid)
+    if (clipsWithSegments.filter(c => !c.isTransition).length === 0) {
       return NextResponse.json(
         { error: 'No clips with valid segments' },
         { status: 400 }
       );
     }
 
-    // Generate the video
-    const videoPath = await createRundownVideo(clipsWithSegments, gamePk);
+    // Generate the video (with optional title card)
+    const videoPath = await createRundownVideo(clipsWithSegments, gamePk, titleCardUrl);
 
     // Read the video file and return as base64
     const videoBuffer = await fs.readFile(videoPath);
