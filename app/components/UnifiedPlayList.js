@@ -417,24 +417,27 @@ export default function UnifiedPlayList({ atBats, gamePk, titleCardUrl }) {
   };
 
   // Auto-activate transitions for innings that have selected plays
+  // Transitions follow the selection state of plays in that inning (unless manually overridden)
   useEffect(() => {
-    const newTransitions = {};
+    setActiveTransitions(prev => {
+      const updated = { ...prev };
+      let hasChanges = false;
 
-    // For each inning group, check if it has any selected plays
-    sortedInnings.forEach(inningGroup => {
-      const transitionKey = getTransitionKey(inningGroup.halfInning, inningGroup.inning);
-      const hasSelectedPlays = inningGroup.plays.some(ab => selectedKeys.has(getAtBatKey(ab)));
+      sortedInnings.forEach(inningGroup => {
+        const transitionKey = getTransitionKey(inningGroup.halfInning, inningGroup.inning);
+        const hasSelectedPlays = inningGroup.plays.some(ab => selectedKeys.has(getAtBatKey(ab)));
 
-      // Only auto-activate if not explicitly set by user
-      if (activeTransitions[transitionKey] === undefined) {
-        newTransitions[transitionKey] = hasSelectedPlays;
-      }
+        // Auto-set transitions to match whether inning has selected plays
+        // This means selecting a play auto-enables the transition,
+        // and deselecting all plays in an inning auto-disables it
+        if (updated[transitionKey] !== hasSelectedPlays) {
+          updated[transitionKey] = hasSelectedPlays;
+          hasChanges = true;
+        }
+      });
+
+      return hasChanges ? updated : prev;
     });
-
-    // Only update if there are new transitions to set
-    if (Object.keys(newTransitions).length > 0) {
-      setActiveTransitions(prev => ({ ...prev, ...newTransitions }));
-    }
   }, [selectedKeys, sortedInnings]);
 
   // Fetch video for an at-bat
@@ -1357,50 +1360,48 @@ export default function UnifiedPlayList({ atBats, gamePk, titleCardUrl }) {
 
           return (
             <div key={label} className="border border-white/10 rounded-lg overflow-hidden">
-              {/* Inning transition toggle - shown above header when active */}
-              {selectedInInning > 0 && (
-                <div
-                  className={`flex items-center gap-3 px-4 py-2 cursor-pointer transition-colors ${
-                    isTransitionActive
-                      ? 'bg-purple-500/20 border-b border-purple-500/30'
-                      : 'bg-gray-800/30 border-b border-white/5'
-                  }`}
-                  onClick={() => toggleTransition(transitionKey)}
-                >
-                  {/* Checkbox */}
-                  <div className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                    isTransitionActive
-                      ? 'bg-purple-500 border-purple-500 text-white'
-                      : 'border-gray-600'
-                  }`}>
-                    {isTransitionActive && (
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-
-                  {/* Transition icon and label */}
-                  <div className="flex items-center gap-2 flex-1">
-                    <svg className={`w-4 h-4 ${isTransitionActive ? 'text-purple-400' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
-                    </svg>
-                    <span className={`text-sm ${isTransitionActive ? 'text-purple-400' : 'text-gray-500'}`}>
-                      {label} Transition
-                    </span>
-                  </div>
-
-                  {/* Preview thumbnail when active */}
+              {/* Inning transition toggle - shown for all innings */}
+              <div
+                className={`flex items-center gap-3 px-4 py-2 cursor-pointer transition-colors ${
+                  isTransitionActive
+                    ? 'bg-purple-500/20 border-b border-purple-500/30'
+                    : 'bg-gray-800/30 border-b border-white/5 hover:bg-gray-700/30'
+                }`}
+                onClick={() => toggleTransition(transitionKey)}
+              >
+                {/* Checkbox */}
+                <div className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                  isTransitionActive
+                    ? 'bg-purple-500 border-purple-500 text-white'
+                    : 'border-gray-600'
+                }`}>
                   {isTransitionActive && (
-                    <video
-                      src={`/api/inning-transition/${transitionKey}`}
-                      className="w-16 h-9 object-cover rounded"
-                      muted
-                      preload="metadata"
-                    />
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
                   )}
                 </div>
-              )}
+
+                {/* Transition icon and label */}
+                <div className="flex items-center gap-2 flex-1">
+                  <svg className={`w-4 h-4 ${isTransitionActive ? 'text-purple-400' : 'text-gray-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                  </svg>
+                  <span className={`text-sm ${isTransitionActive ? 'text-purple-400' : 'text-gray-500'}`}>
+                    {label} Transition
+                  </span>
+                </div>
+
+                {/* Preview thumbnail when active */}
+                {isTransitionActive && (
+                  <video
+                    src={`/api/inning-transition/${transitionKey}`}
+                    className="w-16 h-9 object-cover rounded"
+                    muted
+                    preload="metadata"
+                  />
+                )}
+              </div>
 
               {/* Inning header */}
               <div className="px-4 py-2 bg-blue-400/30 flex items-center justify-between">

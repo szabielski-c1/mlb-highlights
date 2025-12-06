@@ -572,3 +572,36 @@ Transcription complete: 68 words, 28.85s
  POST /api/game/776560/atbat-video 200 in 374ms (compile: 1152µs, render: 372ms)
  ✓ Compiled in 42ms
  ✓ Compiled in 31ms
+ GET /game/776560 200 in 127ms (compile: 60ms, render: 67ms)
+ GET /api/game/776560 200 in 463ms (compile: 23ms, render: 441ms)
+ POST /api/game/776560/atbat-video 200 in 425ms (compile: 1083µs, render: 424ms)
+ POST /api/game/776560/atbat-video 200 in 434ms (compile: 3ms, render: 431ms)
+ POST /api/game/776560/atbat-video 200 in 425ms (compile: 2ms, render: 423ms)
+ POST /api/game/776560/atbat-video 200 in 451ms (compile: 1382µs, render: 450ms)
+ POST /api/game/776560/atbat-video 200 in 197ms (compile: 1176µs, render: 196ms)
+ POST /api/game/776560/atbat-video 200 in 168ms (compile: 1926µs, render: 166ms)
+ POST /api/game/776560/atbat-video 200 in 318ms (compile: 782µs, render: 318ms)
+ POST /api/game/776560/atbat-video 200 in 323ms (compile: 1493µs, render: 322ms)
+ POST /api/game/776560/atbat-video 200 in 474ms (compile: 3ms, render: 471ms)
+ POST /api/game/776560/atbat-video 200 in 471ms (compile: 861µs, render: 470ms)
+ POST /api/game/776560/atbat-video 200 in 434ms (compile: 2ms, render: 432ms)
+ POST /api/game/776560/atbat-video 200 in 551ms (compile: 836µs, render: 550ms)
+ POST /api/game/776560/atbat-video 200 in 231ms (compile: 2ms, render: 228ms)
+ POST /api/game/776560/atbat-video 200 in 110ms (compile: 935µs, render: 109ms)
+ POST /api/game/776560/atbat-video 200 in 398ms (compile: 854µs, render: 397ms)
+ POST /api/game/776560/atbat-video 200 in 396ms (compile: 849µs, render: 395ms)
+ GET /api/inning-transition/bot-3 200 in 506ms (compile: 483ms, render: 22ms)
+ GET /api/inning-transition/bot-4 200 in 37ms (compile: 11ms, render: 26ms)
+ GET /api/inning-transition/bot-5 200 in 28ms (compile: 8ms, render: 20ms)
+ GET /api/inning-transition/top-6 200 in 37ms (compile: 6ms, render: 31ms)
+ GET /api/inning-transition/bot-7 200 in 26ms (compile: 6ms, render: 20ms)
+Generating rundown video for game 776560 with 8 plays + 5 transitions + title card
+Adding title card from highlights video...
+Added transition: bot-3.mp4
+Added transition: bot-4.mp4
+Added transition: bot-5.mp4
+Added transition: top-6.mp4
+Added transition: bot-7.mp4
+ ✓ Compiled in 43ms
+ GET /api/inning-transition/bot-1 200 in 85ms (compile: 7ms, render: 78ms)
+ ✓ Compiled in 43ms
