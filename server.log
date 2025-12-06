@@ -607,3 +607,31 @@ Added transition: bot-7.mp4
  ✓ Compiled in 43ms
 Video generated successfully: /var/folders/0n/594j1_716bqcbgv4hghrr4lh0000gn/T/mlb-highlights/776560/rundown-776560.mp4
  POST /api/generate-rundown-video 200 in 108s (compile: 50ms, render: 108s)
+ GET /game/776560 200 in 125ms (compile: 66ms, render: 59ms)
+ GET /api/game/776560 200 in 327ms (compile: 5ms, render: 322ms)
+ POST /api/game/776560/atbat-video 200 in 589ms (compile: 3ms, render: 586ms)
+ POST /api/game/776560/atbat-video 200 in 594ms (compile: 6ms, render: 588ms)
+ POST /api/game/776560/atbat-video 200 in 667ms (compile: 1017µs, render: 666ms)
+ POST /api/game/776560/atbat-video 200 in 678ms (compile: 3ms, render: 674ms)
+ POST /api/game/776560/atbat-video 200 in 319ms (compile: 13ms, render: 306ms)
+ POST /api/game/776560/atbat-video 200 in 321ms (compile: 7ms, render: 314ms)
+ POST /api/game/776560/atbat-video 200 in 302ms (compile: 1442µs, render: 300ms)
+ POST /api/game/776560/atbat-video 200 in 299ms (compile: 1330µs, render: 297ms)
+ POST /api/game/776560/atbat-video 200 in 411ms (compile: 4ms, render: 407ms)
+ POST /api/game/776560/atbat-video 200 in 411ms (compile: 7ms, render: 404ms)
+ POST /api/game/776560/atbat-video 200 in 658ms (compile: 1057µs, render: 657ms)
+ POST /api/game/776560/atbat-video 200 in 789ms (compile: 915µs, render: 788ms)
+ POST /api/game/776560/atbat-video 200 in 155ms (compile: 6ms, render: 149ms)
+ POST /api/game/776560/atbat-video 200 in 294ms (compile: 6ms, render: 288ms)
+ POST /api/game/776560/atbat-video 200 in 522ms (compile: 861µs, render: 522ms)
+ POST /api/game/776560/atbat-video 200 in 521ms (compile: 2ms, render: 519ms)
+Generating rundown video for game 776560 with 8 plays + 6 transitions + title card
+Adding title card from highlights video...
+Added transition: bot-1.mp4
+Added transition: bot-3.mp4
+Added transition: bot-4.mp4
+Added transition: bot-5.mp4
+Added transition: top-6.mp4
+Added transition: bot-7.mp4
+Video generated successfully: /var/folders/0n/594j1_716bqcbgv4hghrr4lh0000gn/T/mlb-highlights/776560/rundown-776560.mp4
+ POST /api/generate-rundown-video 200 in 107s (compile: 56ms, render: 107s)
